@@ -1,0 +1,67 @@
+import random
+import string
+
+# Colores para la consola
+class Color:
+    VERDE = "\033[92m"
+    ROJO = "\033[91m"
+    AMARILLO = "\033[93m"
+    RESET = "\033[0m"
+
+def pedir_opcion(texto):
+    """Pide una opción s/n y devuelve True/False."""
+    while True:
+        r = input(texto).lower()
+        if r in ("s", "n"):
+            return r == "s"
+        print(Color.ROJO + "Por favor escribe 's' o 'n'." + Color.RESET)
+
+def pedir_longitud():
+    """Pide una longitud válida."""
+    while True:
+        try:
+            n = int(input("Longitud de la contraseña (mínimo 4): "))
+            if n >= 4:
+                return n
+            print(Color.AMARILLO + "La longitud mínima es 4." + Color.RESET)
+        except ValueError:
+            print(Color.ROJO + "Debes escribir un número." + Color.RESET)
+
+def generar_contraseña(longitud, usar_mayus, usar_numeros, usar_simbolos):
+    """Genera una contraseña asegurando al menos un carácter de cada tipo elegido."""
+    base = string.ascii_lowercase
+    grupos = [string.ascii_lowercase]
+
+    if usar_mayus:
+        grupos.append(string.ascii_uppercase)
+        base += string.ascii_uppercase
+    if usar_numeros:
+        grupos.append(string.digits)
+        base += string.digits
+    if usar_simbolos:
+        grupos.append(string.punctuation)
+        base += string.punctuation
+
+    # Garantizar al menos un carácter de cada grupo
+    contraseña = [random.choice(g) for g in grupos]
+
+    # Completar el resto
+    contraseña += [random.choice(base) for _ in range(longitud - len(contraseña))]
+
+    # Mezclar para que no queden los obligatorios al inicio
+    random.shuffle(contraseña)
+
+    return ''.join(contraseña)
+
+if __name__ == "__main__":
+    print(Color.VERDE + "=== Generador de Contraseñas Profesional ===" + Color.RESET)
+
+    longitud = pedir_longitud()
+    usar_mayus = pedir_opcion("¿Incluir mayúsculas? (s/n): ")
+    usar_numeros = pedir_opcion("¿Incluir números? (s/n): ")
+    usar_simbolos = pedir_opcion("¿Incluir símbolos? (s/n): ")
+
+    pwd = generar_contraseña(longitud, usar_mayus, usar_numeros, usar_simbolos)
+
+    print("\n" + Color.VERDE + "Tu contraseña generada es:" + Color.RESET)
+    print(pwd)
